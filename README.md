@@ -10,8 +10,8 @@ This file contains the code for training and testing the neural network model us
 
 To use this classifier, follow these steps:
 
-1. Ensure you have the necessary dependencies installed. (List them here)
-2. Run the script with the command: `python classifier.py`
+1. Ensure you have the necessary dependencies in requirements.txt are installed. 
+2. Run the script in the Jupyter file
 3. The script will train the model using the provided dataset and then test the model.
 
 ## Dataset
@@ -20,16 +20,16 @@ Images contains a total of 832 images in PNG format. Ten butterfly categories ar
 Naming convention: Each image is preceded by the category ID of the butterfly (001, 002, ..., 010).
 
 The scientific (Latin) names of the butterfly categories are:
-001: Danaus plexippus
-002: Heliconius charitonius
-003: Heliconius erato
-004: Junonia coenia
-005: Lycaena phlaeas
-006: Nymphalis antiopa
-007: Papilio cresphontes
-008: Pieris rapae
-009: Vanessa atalanta
-010: Vanessa cardui
+0: Danaus plexippus
+1: Heliconius charitonius
+2: Heliconius erato
+3: Junonia coenia
+4: Lycaena phlaeas
+5: Nymphalis antiopa
+6: Papilio cresphontes
+7: Pieris rapae
+8: Vanessa atalanta
+9: Vanessa cardui
 
 The dataset used for this project can be found at https://zenodo.org/records/7559420.
 
