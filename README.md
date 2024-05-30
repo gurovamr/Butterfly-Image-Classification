@@ -10,9 +10,12 @@ This file contains the code for training and testing the neural network model us
 
 To use this classifier, follow these steps:
 
-1. Ensure you have the necessary dependencies in requirements.txt are installed. 
-2. Run the script in the Jupyter file
-3. The script will train the model using the provided dataset and then test the model.
+1. Ensure you have the necessary dependencies in requirements.txt are installed.
+2. Install the dataset in the same folder as the code
+    and correct the  folder name of the dataset if necessary
+    Dataset: https://zenodo.org/records/7559420 
+3. Run the script in the Jupyter file
+
 
 ## Dataset
 
