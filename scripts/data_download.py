@@ -45,7 +45,7 @@ def download_data(url: str, data_dir: Path) -> Path:
     return zip_path
 
 def extract_data(zip_path: Path, extract_to: Path) -> None:
-    """Extract the downloaded ZIP file to `extract_to`."""
+    """Extract the downloaded ZIP file to `extract_to with flattening`."""
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
         zip_ref.extractall(extract_to)
 
