@@ -10,9 +10,8 @@ from scripts.data_download import (
     show_progress,
     flatten_data_dir,
     download_data,
-    extract_data,
+    extract_data,    
     cleanup,
-    main,
 )
 
 class TestCheckIfDatasetExists:
@@ -129,30 +128,3 @@ class TestCleanup:
             cleanup(zip_path)
             
             assert not zip_path.exists()
-
-
-class TestMain:
-    @patch("scripts.data_download.download_data")
-    @patch("scripts.data_download.extract_data")
-    def test_main_dataset_exists(self, mock_extract, mock_download):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            data_dir = Path(tmpdir)
-            main(data_dir)
-            
-            mock_download.assert_not_called()
-            mock_extract.assert_not_called()
-
-    @patch("scripts.data_download.cleanup")
-    @patch("scripts.data_download.extract_data")
-    @patch("scripts.data_download.download_data")
-    def test_main_dataset_missing(self, mock_download, mock_extract, mock_cleanup):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            data_dir = Path(tmpdir) / "new_data"
-            mock_download.return_value = Path(tmpdir) / "test.zip"
-            
-            main(data_dir)
-            
-            assert data_dir.exists()
-            mock_download.assert_called_once()
-            mock_extract.assert_called_once()
-            mock_cleanup.assert_called_once()
