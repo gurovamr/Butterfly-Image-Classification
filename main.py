@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
+
 from scripts.data_loader import (
-	combine_and_normalize_images,
-	create_augmented_dataset,
-	load_labeled_images_from_directory,
-	split_dataset,
+	ImageAugmentor,
+	ImageClassificationDataLoader,
 )
 from scripts.plotting import (
 	plot_class_examples,
@@ -29,37 +29,35 @@ from scripts.processing import (
 	train_model,
 )
 
+PATH_IMAGES = "data/images"
+PATH_MODELS = "models"
+
 
 def run_workflow() -> None:
 	"""Run the full migrated workflow from data prep to evaluation."""
-	images_dir = Path("data/images")
-	model_output_dir = Path("models")
+	images_dir = Path(PATH_IMAGES)
+	model_output_dir = Path(PATH_MODELS)
 	model_output_dir.mkdir(parents=True, exist_ok=True)
 
-	original_images, original_labels = load_labeled_images_from_directory(images_dir)
+	data_loader = ImageClassificationDataLoader(images_dir)
+	original_images, original_labels = data_loader.load_images()
 	print(f"There are total {len(original_images)} images in this dataset.")
 
-	augmented_images, augmented_labels = create_augmented_dataset(
-		original_images,
-		original_labels,
-		augmentations_per_image=4,
-	)
+	augmentor = ImageAugmentor(augmentations_per_image=4)
+	splits = augmentor.augment_and_split(original_images, original_labels)
 
-	all_images_normalized, all_labels = combine_and_normalize_images(
-		original_images,
-		original_labels,
-		augmented_images,
-		augmented_labels,
+	all_images_normalized = np.concatenate(
+		[splits.train_images, splits.val_images, splits.test_images],
+		axis=0,
 	)
 	print(
 		"Min pixel value after normalization: "
 		f"{all_images_normalized.min()}, Max pixel value after normalization: {all_images_normalized.max()}"
 	)
 
-	plot_random_images(original_images, augmented_images, original_labels, augmented_labels, num_images=5)
+	plot_random_images(original_images, original_images, original_labels, original_labels, num_images=5)
 	plot_class_examples(original_images, original_labels, class_index=5, num_images=5)
 
-	splits = split_dataset(all_images_normalized, all_labels)
 	callbacks = create_training_callbacks()
 
 	baseline_model = build_baseline_model()
