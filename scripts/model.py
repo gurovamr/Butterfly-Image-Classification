@@ -51,23 +51,7 @@ class ButterflyClassifier:
 		self.model = self._build_model(model_type)
 
 	def _build_model(self, model_type: str) -> Sequential:
-		"""Build model based on specified type.
-		
-		Parameters
-		----------
-		model_type : str
-			Type of model to build.
-			
-		Returns
-		-------
-		Sequential
-			Compiled Keras model.
-			
-		Raises
-		------
-		ValueError
-			If model_type is not recognized.
-		"""
+		"""Build model based on specified type.	"""
 		if model_type == "baseline":
 			return self._build_baseline()
 		elif model_type == "improved":
@@ -82,10 +66,10 @@ class ButterflyClassifier:
 		"""Build baseline CNN architecture.
 		
 		Architecture:
-		- 3 Conv2D blocks with increasing filters (32, 64, 128)
+		- 3 Conv2D blocks with increasing filters
 		- MaxPooling2D after each conv block
 		- Single BatchNormalization after 2nd conv
-		- Dense layers: 256 → 128 → num_classes
+		- Dense layers with decreasing units
 		- No dropout
 		
 		Returns
@@ -119,11 +103,11 @@ class ButterflyClassifier:
 		"""Build improved CNN architecture with regularization.
 		
 		Architecture:
-		- 3 Conv2D blocks with increasing filters (32, 64, 128)
+		- 3 Conv2D blocks with increasing filters
 		- BatchNormalization after every conv block
 		- MaxPooling2D after each conv block
-		- Dense layers: 256 → 128 → num_classes
-		- Dropout (0.2, 0.3) in dense layers
+		- Dense layers with decreasing units
+		- Dropout in dense layers
 		
 		Returns
 		-------
@@ -157,27 +141,10 @@ class ButterflyClassifier:
 		return model
 
 	def save(self, output_path: str | Path) -> None:
-		"""Save the trained model to disk.
-		
-		Parameters
-		----------
-		output_path : str | Path
-			Path where the model will be saved (should end with .keras).
-		"""
+		"""Save the trained model to disk."""
 		self.model.save(Path(output_path).as_posix())
 
 	@staticmethod
 	def load(model_path: str | Path) -> Sequential:
-		"""Load a saved Keras model from disk.
-		
-		Parameters
-		----------
-		model_path : str | Path
-			Path to the saved model file.
-			
-		Returns
-		-------
-		Sequential
-			Loaded Keras model.
-		"""
+		"""Load a saved Keras model from disk."""
 		return load_model(Path(model_path).as_posix())

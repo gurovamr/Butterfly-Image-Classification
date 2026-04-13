@@ -1,5 +1,4 @@
 {
-    "python.defaultInterpreterPath": "C:\\Users\\gurov\\anaconda3\\envs\\butterfly-classification\\python.exe",
     "python.terminal.activateEnvironment": true,
     "python.testing.pytestArgs": [
         "tests"

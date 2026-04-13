@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -121,21 +121,6 @@ class ImageAugmentor:
 		return augmented_images, augmented_labels
 
 	@staticmethod
-	def combine_images(
-		original_images: list[np.ndarray],
-		original_labels: list[int],
-		augmented_images: list[np.ndarray],
-		augmented_labels: list[int],
-	) -> tuple[list[np.ndarray], list[int]]:
-		"""Combine original and augmented samples into unified lists.
-		
-		Note: Does NOT normalize. Use normalize_images() separately.
-		"""
-		all_images = original_images + augmented_images
-		all_labels = original_labels + augmented_labels
-		return all_images, all_labels
-
-	@staticmethod
 	def normalize_images(images: list[np.ndarray]) -> np.ndarray:
 		"""Normalize pixel values to [0, 1] range.
 		
@@ -162,28 +147,7 @@ class ImageAugmentor:
 		random_state: int = 42,
 		label_offset: int = 1,
 	) -> DatasetSplits:
-		"""Split data into train, validation, and test sets.
-		
-		Parameters
-		----------
-		images : np.ndarray
-			Normalized image array.
-		labels : np.ndarray
-			Corresponding label array.
-		validation_size : float, default=0.2
-			Proportion of data for validation + test combined.
-		validation_to_test_ratio : float, default=0.5
-			Proportion of validation+test to use for test.
-		random_state : int, default=42
-			Random seed for reproducibility.
-		label_offset : int, default=1
-			Value to subtract from labels (e.g., convert 1-10 to 0-9).
-		
-		Returns
-		-------
-		DatasetSplits
-			Container with train/val/test splits.
-		"""
+		"""Split data into train, validation, and test sets."""
 		(
 			train_images,
 			val_images,
@@ -226,29 +190,9 @@ class ImageAugmentor:
 		random_state: int = 42,
 		label_offset: int = 1,
 	) -> DatasetSplits:
-		"""Full pipeline to augment, combine, normalize, and split dataset.
-		
-		Parameters
-		----------
-		images : List[np.ndarray]
-			Original image list.
-		labels : List[int]
-			Original label list.
-		validation_size : float, default=0.2
-			Proportion of data for validation + test.
-		validation_to_test_ratio : float, default=0.5
-			Proportion of val+test to use for test.
-		random_state : int, default=42
-			Random seed for reproducibility.
-		label_offset : int, default=1
-			Value to subtract from labels.
-		
-		Returns
-		-------
-		DatasetSplits
-			Train/val/test splits with normalized images.
-		"""
+		"""Full pipeline to augment, combine, normalize, and split dataset."""
 		augmented_images, augmented_labels = self.augment_dataset(images, labels)
-		all_images, all_labels = self.combine_images(images, labels, augmented_images, augmented_labels)
+		all_images = images + augmented_images
+		all_labels = labels + augmented_labels
 		all_images_normalized = self.normalize_images(all_images)
 		return self.split_dataset(all_images_normalized, all_labels, validation_size, validation_to_test_ratio, random_state, label_offset)

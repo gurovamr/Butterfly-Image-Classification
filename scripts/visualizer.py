@@ -8,13 +8,14 @@ from collections import Counter
 from pathlib import Path
 
 import matplotlib
+
+# Use non-interactive backend to prevent popups
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
-
-# Use non-interactive backend to prevent popups
-matplotlib.use('Agg')
 
 
 class TrainingVisualizer:
@@ -38,7 +39,6 @@ class TrainingVisualizer:
 		self.num_classes = num_classes
 		self.save_dir = Path(save_dir)
 		self.save_dir.mkdir(parents=True, exist_ok=True)
-		self.plot_counter = 0  # Track plot numbers for unique filenames
 
 	def plot_random_images(
 		self,

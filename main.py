@@ -10,10 +10,10 @@ from scripts.dataset import (
 	ImageAugmentor,
 	ImageClassificationDataLoader,
 )
-from scripts.evaluater import ModelEvaluator
+from scripts.evaluator import ModelEvaluator
 from scripts.model import ButterflyClassifier
 from scripts.train import ModelTrainer
-from scripts.vizualizer import TrainingVisualizer
+from scripts.visualizer import TrainingVisualizer
 
 PATH_IMAGES = "data/images"
 PATH_MODELS = "models"

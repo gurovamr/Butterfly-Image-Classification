@@ -2,7 +2,7 @@ import zipfile
 from pathlib import Path
 import urllib.request
 
-ZENODO_URL = "https://zenodo.org/records/7559420/files/leedsbutterfly_dataset_v1.1.zip?download=1"
+from scripts.config import DATA_DIR, ZENODO_URL
 
 def check_if_dataset_exists(data_dir: Path) -> bool:
     """Check whether dataset images exist."""
@@ -70,4 +70,4 @@ def main(data_dir: Path) -> None:
         cleanup(zip_path)
 
 if __name__ == "__main__":
-    main(Path("data"))
+    main(DATA_DIR)
