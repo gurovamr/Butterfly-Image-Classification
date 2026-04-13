@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -120,100 +120,24 @@ class ImageAugmentor:
 
 		return augmented_images, augmented_labels
 
-
-	@staticmethod
-	def combine_and_normalize_images(
-		original_images: list[np.ndarray],
-		original_labels: list[int],
-		augmented_images: list[np.ndarray],
-		augmented_labels: list[int],
-	) -> tuple[np.ndarray, np.ndarray]:
-		"""Combine original + augmented samples and normalize pixel values.
-		"""
-		all_images = original_images + augmented_images
-		all_labels = original_labels + augmented_labels
-
-		all_images_array = np.asarray(all_images, dtype=np.float32)
-		normalized_images = all_images_array / 255.0
-		labels_array = np.asarray(all_labels, dtype=np.int32)
-
-		return normalized_images, labels_array
-
-
-	@staticmethod
-	def split_dataset(
-		images: np.ndarray,
-		labels: np.ndarray,
-		validation_size: float = 0.2,
-		validation_to_test_ratio: float = 0.5,
-		random_state: int = 42,
-		label_offset: int = 1,
-	) -> DatasetSplits:
-		"""Split data into train, validation, and test sets.
-		"""
-		(
-			train_images,
-			val_images,
-			train_labels,
-			val_labels,
-		) = train_test_split(
-			images,
-			labels,
-			test_size=validation_size,
-			random_state=random_state,
-		)
-
-		(
-			val_images,
-			test_images,
-			val_labels,
-			test_labels,
-		) = train_test_split(
-			val_images,
-			val_labels,
-			test_size=validation_to_test_ratio,
-			random_state=random_state,
-		)
-
-		return DatasetSplits(
-			train_images=train_images,
-			val_images=val_images,
-			test_images=test_images,
-			train_labels=np.asarray(train_labels, dtype=np.int32) - label_offset,
-			val_labels=np.asarray(val_labels, dtype=np.int32) - label_offset,
-			test_labels=np.asarray(test_labels, dtype=np.int32) - label_offset,
-		)
-
-
-	@staticmethod
-	def _iter_files(directory: Path) -> Iterable[Path]:
-		"""Yield all direct child files from a directory."""
-		return (path for path in directory.iterdir() if path.is_file())
-
-
-
-	@staticmethod
-	def combine__images(
-		original_images: list[np.ndarray],
-		original_labels: list[int],
-		augmented_images: list[np.ndarray],
-		augmented_labels: list[int],
-	) -> tuple[np.ndarray, np.ndarray]:
-		"""Combine original + augmented samples and normalize pixel values.
-		"""
-		all_images = original_images + augmented_images
-		all_labels = original_labels + augmented_labels
-		return all_images, all_labels
-
 	@staticmethod
 	def normalize_images(images: list[np.ndarray]) -> np.ndarray:
-		"""Normalize pixel values to [0, 1].
+		"""Normalize pixel values to [0, 1] range.
+		
+		Parameters
+		----------
+		images : list[np.ndarray]
+			List of image arrays with pixel values in [0, 255] range.
+		
+		Returns
+		-------
+		np.ndarray
+			Normalized image array with values in [0, 1] range.
 		"""
 		all_images_array = np.asarray(images, dtype=np.float32)
 		normalized_images = all_images_array / 255.0
 		return normalized_images
 
-
 	@staticmethod
 	def split_dataset(
 		images: np.ndarray,
@@ -223,9 +147,7 @@ class ImageAugmentor:
 		random_state: int = 42,
 		label_offset: int = 1,
 	) -> DatasetSplits:
-		"""Split data into train, validation, and test sets.
-
-		"""
+		"""Split data into train, validation, and test sets."""
 		(
 			train_images,
 			val_images,
@@ -259,12 +181,6 @@ class ImageAugmentor:
 			test_labels=np.asarray(test_labels, dtype=np.int32) - label_offset,
 		)
 
-
-	@staticmethod
-	def _iter_files(directory: Path) -> Iterable[Path]:
-		"""Yield all direct child files from a directory."""
-		return (path for path in directory.iterdir() if path.is_file())
-	
 	def augment_and_split(
 		self,
 		images: List[np.ndarray],
@@ -276,6 +192,7 @@ class ImageAugmentor:
 	) -> DatasetSplits:
 		"""Full pipeline to augment, combine, normalize, and split dataset."""
 		augmented_images, augmented_labels = self.augment_dataset(images, labels)
-		all_images, all_labels = self.combine__images(images, labels, augmented_images, augmented_labels)
+		all_images = images + augmented_images
+		all_labels = labels + augmented_labels
 		all_images_normalized = self.normalize_images(all_images)
 		return self.split_dataset(all_images_normalized, all_labels, validation_size, validation_to_test_ratio, random_state, label_offset)
