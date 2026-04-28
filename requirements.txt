@@ -4,3 +4,6 @@ scikit-learn
 matplotlib
 seaborn
 tensorflow
+pytest
+pytest-mock
+pytest-cov

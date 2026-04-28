@@ -1,6 +1,7 @@
 import numpy as np
+import pytest
 
-from scripts.evaluater import ModelEvaluator
+from scripts.evaluator import ModelEvaluator
 
 
 class DummyPredictionModel:
@@ -16,6 +17,7 @@ class DummyPredictionModel:
 
 
 class TestPredict:
+    # Equivalence class 1: argmax of softmax probabilities gives correct class indices
     def test_returns_argmax_class_indices(self):
         images = np.zeros((3, 8, 8, 3), dtype=np.float32)
 
@@ -25,6 +27,7 @@ class TestPredict:
 
 
 class TestCalculateClassAccuracy:
+    # Equivalence class 1: mixed correct/incorrect predictions with a missing class
     def test_reports_accuracy_per_class_and_zero_for_missing_classes(self):
         evaluator = ModelEvaluator(num_classes=4)
         true_labels = np.array([0, 0, 1, 2, 2], dtype=np.int32)
@@ -32,7 +35,15 @@ class TestCalculateClassAccuracy:
 
         result = evaluator.calculate_class_accuracy(true_labels, predicted_labels)
 
-        assert result[0] == 0.5
-        assert result[1] == 1.0
-        assert result[2] == 0.5
-        assert result[3] == 0.0
+        assert result[0] == pytest.approx(0.5)
+        assert result[1] == pytest.approx(1.0)
+        assert result[2] == pytest.approx(0.5)
+        # Equivalence class 2: edge case — class with no samples returns 0.0
+        assert result[3] == pytest.approx(0.0)
+
+    # Equivalence class 3: all predictions correct — every class returns 1.0
+    def test_perfect_predictions_give_1_0(self):
+        evaluator = ModelEvaluator(num_classes=3)
+        labels = np.array([0, 1, 2], dtype=np.int32)
+        result = evaluator.calculate_class_accuracy(labels, labels)
+        assert all(result[c] == pytest.approx(1.0) for c in range(3))

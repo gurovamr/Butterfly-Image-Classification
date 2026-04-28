@@ -56,13 +56,13 @@ def cleanup(zip_path: Path) -> None:
     """Remove the downloaded ZIP file after extraction."""
     zip_path.unlink()
 
-def main(data_dir: Path) -> None:
+def main(data_dir: Path, url: str = ZENODO_URL) -> None:
     """Check whether the dataset is present; download and extract it into `data_dir` if missing."""
     if check_if_dataset_exists(data_dir):
         return
 
     create_data_dir(data_dir)
-    zip_path = download_data(ZENODO_URL, data_dir)
+    zip_path = download_data(url, data_dir)
 
     try:
         extract_data(zip_path, data_dir)

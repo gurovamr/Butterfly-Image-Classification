@@ -121,6 +121,16 @@ class ImageAugmentor:
 		return augmented_images, augmented_labels
 
 	@staticmethod
+	def combine_images(
+		original_images: List[np.ndarray],
+		original_labels: List[int],
+		augmented_images: List[np.ndarray],
+		augmented_labels: List[int],
+	) -> Tuple[List[np.ndarray], List[int]]:
+		"""Combine original and augmented image/label lists."""
+		return original_images + augmented_images, original_labels + augmented_labels
+
+	@staticmethod
 	def normalize_images(images: list[np.ndarray]) -> np.ndarray:
 		"""Normalize pixel values to [0, 1] range.
 		
@@ -192,7 +202,6 @@ class ImageAugmentor:
 	) -> DatasetSplits:
 		"""Full pipeline to augment, combine, normalize, and split dataset."""
 		augmented_images, augmented_labels = self.augment_dataset(images, labels)
-		all_images = images + augmented_images
-		all_labels = labels + augmented_labels
+		all_images, all_labels = self.combine_images(images, labels, augmented_images, augmented_labels)
 		all_images_normalized = self.normalize_images(all_images)
 		return self.split_dataset(all_images_normalized, all_labels, validation_size, validation_to_test_ratio, random_state, label_offset)
