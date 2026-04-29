@@ -29,7 +29,20 @@ jobs:
         run: black --check .
 
       - name: Run tests + doctests + coverage
-        run: pytest --doctest-modules --cov=. --cov-report=xml
+        run: pytest --doctest-modules --cov=scripts --cov-report=xml --junitxml=junit/test-results.xml
+
+      - name: Upload test results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: junit/test-results.xml
+        if: always()
+
+      - name: Publish test results to PR
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: "!cancelled()"
+        with:
+          files: junit/*.xml
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
