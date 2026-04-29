@@ -160,4 +160,31 @@ class TestSplitDataset:
         assert splits.train_labels.max() == 0
 
 
+class TestLoadImages:
+    # Equivalence class 1: full pipeline — load_images() calls internal steps and returns images+labels
+    def test_load_images_pipeline(self, mocker, make_image):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            d = Path(tmpdir)
+            fake_img = make_image()
+            (d / "0010001.png").touch()
+            loader = ImageClassificationDataLoader(d)
+            mocker.patch("scripts.dataset.load_img", return_value=MagicMock())
+            mocker.patch("scripts.dataset.img_to_array", return_value=fake_img)
+            images, labels = loader.load_images()
+        assert len(images) == 1
+        assert labels == [1]
+
+
+class TestPrepareDataset:
+    # Equivalence class 1: full pipeline — augment_and_split() returns a DatasetSplits instance
+    def test_augment_and_split_returns_splits(self, make_image):
+        augmentor = ImageAugmentor(augmentations_per_image=1)
+        images = [make_image() for _ in range(20)]
+        labels = [i % 5 + 1 for i in range(20)]
+        splits = augmentor.augment_and_split(images, labels)
+        assert isinstance(splits, DatasetSplits)
+        total = len(splits.train_images) + len(splits.val_images) + len(splits.test_images)
+        assert total == 40  # 20 original + 20 augmented (1 per image)
+
+
 

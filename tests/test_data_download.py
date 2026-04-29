@@ -112,6 +112,20 @@ class TestFlattenDataDir:
             flatten_data_dir(data_dir)
             assert data_dir.exists()
 
+    # Equivalence class 4: edge case — file collision: target already exists — nested file is skipped
+    def test_skips_file_when_target_already_exists(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            data_dir = Path(tmpdir)
+            nested_dir = data_dir / "nested"
+            nested_dir.mkdir()
+            (nested_dir / "file.txt").write_text("nested content")
+            (data_dir / "file.txt").write_text("existing content")  # collision
+
+            flatten_data_dir(data_dir)
+
+            # Existing file must not be overwritten
+            assert (data_dir / "file.txt").read_text() == "existing content"
+
 
 class TestDownloadData:
     # Equivalence class 1: successful download — correct path returned and urlretrieve called

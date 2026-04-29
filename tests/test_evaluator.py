@@ -4,6 +4,11 @@ import pytest
 from scripts.evaluator import ModelEvaluator
 
 
+class DummyEvaluateModel:
+    def evaluate(self, images: np.ndarray, labels: np.ndarray):
+        return 0.25, 0.9
+
+
 class DummyPredictionModel:
     def predict(self, images: np.ndarray) -> np.ndarray:
         return np.array(
@@ -47,3 +52,14 @@ class TestCalculateClassAccuracy:
         labels = np.array([0, 1, 2], dtype=np.int32)
         result = evaluator.calculate_class_accuracy(labels, labels)
         assert all(result[c] == pytest.approx(1.0) for c in range(3))
+
+
+class TestEvaluate:
+    # Equivalence class 1: evaluate() returns loss and accuracy unpacked as floats
+    def test_returns_loss_and_accuracy_as_floats(self):
+        images = np.zeros((3, 8, 8, 3), dtype=np.float32)
+        labels = np.array([0, 1, 2], dtype=np.int32)
+        evaluator = ModelEvaluator(num_classes=3)
+        loss, acc = evaluator.evaluate(DummyEvaluateModel(), images, labels)
+        assert loss == pytest.approx(0.25)
+        assert acc == pytest.approx(0.9)

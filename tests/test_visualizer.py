@@ -60,3 +60,56 @@ class TestPlotTrainingHistory:
         viz.plot_training_history({})
         assert (tmp_path / "03_loss.png").exists()
         assert (tmp_path / "04_accuracy.png").exists()
+
+
+class TestPlotConfusionMatrix:
+    # Equivalence class 1: normal call — output file is created on disk
+    def test_creates_output_file(self, tmp_path):
+        viz = TrainingVisualizer(num_classes=3, save_dir=tmp_path)
+        true_labels = np.array([0, 1, 2, 0, 1])
+        predicted_labels = np.array([0, 2, 2, 1, 1])
+        viz.plot_confusion_matrix(true_labels, predicted_labels)
+        assert (tmp_path / "05_confusion_matrix.png").exists()
+
+    # Equivalence class 2: perfect predictions — diagonal-only confusion matrix, file created
+    def test_perfect_predictions_creates_output_file(self, tmp_path):
+        viz = TrainingVisualizer(num_classes=3, save_dir=tmp_path)
+        labels = np.array([0, 1, 2])
+        viz.plot_confusion_matrix(labels, labels)
+        assert (tmp_path / "05_confusion_matrix.png").exists()
+
+
+class TestPlotPredictionSamples:
+    # Equivalence class 1: normal call — output file is created on disk
+    def test_creates_output_file(self, tmp_path, make_image):
+        viz = TrainingVisualizer(save_dir=tmp_path)
+        images = np.stack([make_image(h=32, w=32)] * 6)
+        true_labels = np.array([0, 1, 2, 0, 1, 2])
+        predicted_labels = np.array([0, 1, 0, 0, 2, 2])
+        viz.plot_prediction_samples(images, true_labels, predicted_labels, num_images=4)
+        assert (tmp_path / "06_prediction_samples.png").exists()
+
+    # Equivalence class 2: edge case — num_images larger than dataset is capped to len(images)
+    def test_num_images_capped_to_dataset_size(self, tmp_path, make_image):
+        viz = TrainingVisualizer(save_dir=tmp_path)
+        images = np.stack([make_image(h=32, w=32)] * 3)
+        labels = np.array([0, 1, 2])
+        viz.plot_prediction_samples(images, labels, labels, num_images=100)
+        assert (tmp_path / "06_prediction_samples.png").exists()
+
+
+class TestPlotClassHistogram:
+    # Equivalence class 1: mixed correct/incorrect predictions — output file is created
+    def test_creates_output_file(self, tmp_path):
+        viz = TrainingVisualizer(num_classes=3, save_dir=tmp_path)
+        true_labels = np.array([0, 0, 1, 1, 2, 2])
+        predicted_labels = np.array([0, 1, 1, 0, 2, 2])
+        viz.plot_class_histogram(true_labels, predicted_labels)
+        assert (tmp_path / "07_class_prediction_histogram.png").exists()
+
+    # Equivalence class 2: all predictions correct — correct counts equal total counts
+    def test_all_correct_creates_output_file(self, tmp_path):
+        viz = TrainingVisualizer(num_classes=3, save_dir=tmp_path)
+        labels = np.array([0, 1, 2])
+        viz.plot_class_histogram(labels, labels)
+        assert (tmp_path / "07_class_prediction_histogram.png").exists()
