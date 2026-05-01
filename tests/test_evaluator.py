@@ -32,8 +32,8 @@ class TestPredict:
 
 
 class TestCalculateClassAccuracy:
-    # Equivalence class 1: mixed correct/incorrect predictions with a missing class
-    def test_reports_accuracy_per_class_and_zero_for_missing_classes(self):
+    # Equivalence class 1: mixed correct/incorrect predictions
+    def test_mixed_predictions_report_correct_accuracy_per_class(self):
         evaluator = ModelEvaluator(num_classes=4)
         true_labels = np.array([0, 0, 1, 2, 2], dtype=np.int32)
         predicted_labels = np.array([0, 1, 1, 2, 0], dtype=np.int32)
@@ -43,7 +43,15 @@ class TestCalculateClassAccuracy:
         assert result[0] == pytest.approx(0.5)
         assert result[1] == pytest.approx(1.0)
         assert result[2] == pytest.approx(0.5)
-        # Equivalence class 2: edge case — class with no samples returns 0.0
+
+    # Equivalence class 2: edge case — class with no samples returns 0.0
+    def test_class_with_no_samples_returns_zero_accuracy(self):
+        evaluator = ModelEvaluator(num_classes=4)
+        true_labels = np.array([0, 1, 2], dtype=np.int32)
+        predicted_labels = np.array([0, 1, 2], dtype=np.int32)
+
+        result = evaluator.calculate_class_accuracy(true_labels, predicted_labels)
+
         assert result[3] == pytest.approx(0.0)
 
     # Equivalence class 3: all predictions correct — every class returns 1.0

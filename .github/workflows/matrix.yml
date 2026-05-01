@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10.14", "3.11.9", "3.12.3"]
 
     steps:
       - uses: actions/checkout@v4
@@ -21,14 +21,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: 'pip'
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install pytest pytest-mock pytest-cov
+        run: pip install ".[dev]"
 
       - name: Run tests
-        run: pytest tests/ --tb=short -q
+        run: pytest --tb=short -q
 
   pylint:
     runs-on: ubuntu-latest
@@ -39,12 +38,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.10.14'
+          cache: 'pip'
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install pylint
+        run: pip install ".[dev]"
 
       - name: Run pylint
         run: pylint scripts/ main.py --fail-under=8.0

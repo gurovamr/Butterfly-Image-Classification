@@ -137,7 +137,7 @@ class TestNormalizeImages:
 class TestSplitDataset:
     # Equivalence class 1: output is a DatasetSplits instance
     def test_returns_dataset_splits(self):
-        images = np.random.rand(20, 128, 128, 3).astype(np.float32)
+        images = np.zeros((20, 128, 128, 3), dtype=np.float32)
         labels = np.array([i % 5 + 1 for i in range(20)], dtype=np.int32)
         splits = ImageAugmentor.split_dataset(images, labels)
         assert isinstance(splits, DatasetSplits)
@@ -145,7 +145,7 @@ class TestSplitDataset:
     # Equivalence class 2: total samples across all splits equals input size
     def test_total_samples_preserved(self):
         n = 20
-        images = np.random.rand(n, 128, 128, 3).astype(np.float32)
+        images = np.zeros((n, 128, 128, 3), dtype=np.float32)
         labels = np.array([i % 5 + 1 for i in range(n)], dtype=np.int32)
         splits = ImageAugmentor.split_dataset(images, labels)
         total = len(splits.train_images) + len(splits.val_images) + len(splits.test_images)

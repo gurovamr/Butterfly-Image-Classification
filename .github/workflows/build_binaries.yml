@@ -33,7 +33,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install .
           pip install pyinstaller
 
       - name: Build executable
@@ -73,3 +73,11 @@ jobs:
         with:
           name: butterfly-classifier-${{ matrix.target }}
           path: release/
+
+      - name: Create or update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -143,6 +143,18 @@ class ImageAugmentor:
 		-------
 		np.ndarray
 			Normalized image array with values in [0, 1] range.
+
+		Examples
+		--------
+		>>> import numpy as np
+		>>> imgs = [np.full((1, 1, 3), 255.0, dtype=np.float32)]
+		>>> result = ImageAugmentor.normalize_images(imgs)
+		>>> float(result.max())
+		1.0
+		>>> imgs = [np.zeros((1, 1, 3), dtype=np.float32)]
+		>>> result = ImageAugmentor.normalize_images(imgs)
+		>>> float(result.min())
+		0.0
 		"""
 		all_images_array = np.asarray(images, dtype=np.float32)
 		normalized_images = all_images_array / 255.0
