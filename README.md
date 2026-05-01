@@ -1,5 +1,10 @@
 # Butterfly Image Classification
 
+[![License: MIT](https://img.shields.io/github/license/gurovamr/Butterfly-Image-Classification)](LICENSE)
+[![CI](https://github.com/gurovamr/Butterfly-Image-Classification/actions/workflows/ci.yml/badge.svg)](https://github.com/gurovamr/Butterfly-Image-Classification/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/gurovamr/Butterfly-Image-Classification/graph/badge.svg)](https://codecov.io/gh/gurovamr/Butterfly-Image-Classification)
+[![Release](https://img.shields.io/github/v/release/gurovamr/Butterfly-Image-Classification)](https://github.com/gurovamr/Butterfly-Image-Classification/releases)
+
 A deep learning pipeline that trains CNN models to classify 10 species of butterflies from the [Leeds Butterfly Dataset](https://zenodo.org/records/7559420). The project covers the full ML workflow: data download, augmentation, training two model architectures, evaluation, and visualization.
 
 ---
