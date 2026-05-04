@@ -23,9 +23,19 @@ A deep learning pipeline that trains CNN models to classify 10 species of butter
 
 **Clone and install:**
 ```bash
+# 1. clone repo
 git clone https://github.com/gurovamr/Butterfly-Image-Classification.git
 cd Butterfly-Image-Classification
-pip install .
+
+# 2. create environment
+python -m venv .venv
+.venv\Scripts\activate   # Windows
+
+# 3. install project
+pip install -e .
+
+# 4. run
+butterfly-classifier
 ```
 
 **Run the full pipeline:**

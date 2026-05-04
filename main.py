@@ -1,10 +1,18 @@
 """Project entry point for the butterfly classification workflow."""
 
+
 from __future__ import annotations
 
+import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
 from pathlib import Path
+from scripts.data_download import main as data_download
+from scripts.config import DATA_DIR
 
 import numpy as np
+
 
 from scripts.dataset import (
 	ImageAugmentor,
@@ -23,6 +31,7 @@ PATH_RESULTS = "results"
 def run_workflow() -> None:
 	"""Run the full migrated workflow from data prep to evaluation."""
 	# Setup paths
+	data_download(DATA_DIR)
 	images_dir = Path(PATH_IMAGES)
 	model_output_dir = Path(PATH_MODELS)
 	model_output_dir.mkdir(parents=True, exist_ok=True)
