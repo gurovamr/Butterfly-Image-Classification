@@ -51,7 +51,8 @@ packages = ["scripts"]
 py-modules = ["main"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+addopts = "--doctest-modules --cov=scripts --cov-fail-under=80"
+testpaths = ["tests", "scripts"]
 
 [tool.ruff]
 line-length = 100
@@ -68,3 +69,18 @@ omit = ["*/tests/*", "*/__init__.py"]
 [tool.coverage.report]
 show_missing = true
 exclude_lines = ["if __name__ == .__main__.:"]
+
+[tool.pylint.master]
+extension-pkg-allow-list = ""
+ignored-modules = ["tensorflow", "tensorflow.keras", "keras"]
+
+[tool.pylint.typecheck]
+ignored-modules = ["tensorflow", "tensorflow.keras", "keras"]
+
+[tool.pylint.design]
+max-args = 8
+max-positional-arguments = 8
+max-locals = 25
+
+[tool.pylint.format]
+max-line-length = 100

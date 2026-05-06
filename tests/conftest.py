@@ -12,6 +12,8 @@ if str(PROJECT_ROOT) not in sys.path:
 @pytest.fixture
 def make_image():
     """Factory fixture that returns a helper to create fake image arrays."""
+
     def _make(h: int = 128, w: int = 128, c: int = 3, fill: float = 128.0) -> np.ndarray:
         return np.full((h, w, c), fill, dtype=np.float32)
+
     return _make

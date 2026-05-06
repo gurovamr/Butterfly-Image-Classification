@@ -215,4 +215,3 @@ class TestMain:
             main(tmp_path)
 
         mock_cleanup.assert_called_once()
-

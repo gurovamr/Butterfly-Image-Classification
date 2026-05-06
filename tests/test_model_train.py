@@ -71,6 +71,7 @@ class TestModelTrainerTrain:
     # Equivalence class 1: train() with explicit callbacks passes them through to model.fit
     def test_train_with_explicit_callbacks(self):
         import numpy as np
+
         trainer = ModelTrainer()
         dummy_model = DummyFitModel()
         train_images = np.zeros((4, 8, 8, 3), dtype=np.float32)
@@ -80,8 +81,13 @@ class TestModelTrainerTrain:
         callbacks = []
 
         result = trainer.train(
-            dummy_model, train_images, train_labels, val_images, val_labels,
-            epochs=1, callbacks=callbacks
+            dummy_model,
+            train_images,
+            train_labels,
+            val_images,
+            val_labels,
+            epochs=1,
+            callbacks=callbacks,
         )
 
         assert result == "history"
@@ -91,6 +97,7 @@ class TestModelTrainerTrain:
     # Equivalence class 2: train() with callbacks=None — default callbacks are created automatically
     def test_train_creates_default_callbacks_when_none(self):
         import numpy as np
+
         trainer = ModelTrainer()
         dummy_model = DummyFitModel()
         train_images = np.zeros((4, 8, 8, 3), dtype=np.float32)
