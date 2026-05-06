@@ -41,7 +41,7 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        run: pip install ".[dev]"
+        run: pip install ".[dev,test]"
 
       - name: Run tests + doctests + coverage
         run: pytest --doctest-modules --cov=scripts --cov-report=xml --cov-fail-under=80 --junitxml=junit/test-results.xml

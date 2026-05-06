@@ -160,7 +160,7 @@ class TestSplitDataset:
         assert splits.train_labels.max() == 0
 
 
-class TestLoadImages:
+class TestLoadImagesPipeline:
     # Equivalence class 1: full pipeline — load_images() calls internal steps and returns images+labels
     def test_load_images_pipeline(self, mocker, make_image):
         with tempfile.TemporaryDirectory() as tmpdir:
