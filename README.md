@@ -107,8 +107,7 @@ Butterfly-Image-Classification/
 │   │   └── build_binaries.yml# PyInstaller builds for Linux/Windows/macOS on tag push
 │   └── dependabot.yml        # Weekly dependency updates
 │
-├── pyproject.toml            # Package config, dependencies, ruff/black settings
-├── pytest.ini                # pytest defaults (doctest-modules, cov-fail-under=80)
+├── pyproject.toml            # Package config, dependencies, tool config (black, ruff, pylint, pytest, coverage)
 └── codecov.yml               # Codecov PR status check config
 ```
 
