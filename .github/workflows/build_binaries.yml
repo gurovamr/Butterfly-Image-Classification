@@ -47,10 +47,18 @@ jobs:
           pyinstaller \
             --onefile \
             --name "${BINARY_NAME}" \
-            --hidden-import=tensorflow \
+            --hidden-import=numpy \
+            --hidden-import=pandas \
             --hidden-import=sklearn.utils._cython_blas \
             --hidden-import=sklearn.neighbors.typedefs \
+            --hidden-import=sklearn.preprocessing._encoders \
+            --hidden-import=tensorflow \
+            --collect-all numpy \
+            --collect-all pandas \
+            --collect-all sklearn \
             --collect-all tensorflow \
+            --collect-all matplotlib \
+            --collect-all seaborn \
             main.py
 
           mkdir -p release
