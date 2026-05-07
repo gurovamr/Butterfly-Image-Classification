@@ -1,5 +1,6 @@
 """Dataset download and extraction utilities."""
 
+import shutil
 import zipfile
 from pathlib import Path
 import urllib.request
@@ -37,8 +38,11 @@ def flatten_data_dir(data_dir: Path) -> None:
     nested_root_dir = nested_directories[0]
     for item in list(nested_root_dir.iterdir()):
         target = data_dir / item.name
-        if target.exists():
-            continue
+        
+        if target.exists() and target.is_dir():
+            shutil.rmtree(target)
+        elif target.exists():
+            target.unlink()
         item.rename(target)
 
     if not any(nested_root_dir.iterdir()):
