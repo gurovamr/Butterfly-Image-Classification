@@ -36,8 +36,13 @@ class ImageClassificationDataLoader:
         self.image_size = image_size
 
     def _list_image_file_paths(self) -> List[Path]:
-        """Return all file paths."""
-        return [file_path for file_path in self.directory.iterdir() if file_path.is_file()]
+        """Return all image file paths recursively from directory and subdirectories."""
+        image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp'}
+        image_files = []
+        for file_path in self.directory.rglob('*'):
+            if file_path.is_file() and file_path.suffix.lower() in image_extensions:
+                image_files.append(file_path)
+        return image_files
 
     def _extract_labels(self, paths: List[Path]) -> Dict[Path, int]:
         """Map file paths to labels."""
