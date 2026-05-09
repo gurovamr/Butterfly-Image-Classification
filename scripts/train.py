@@ -1,7 +1,5 @@
 """Model training utilities with callbacks and history tracking."""
 
-from __future__ import annotations
-
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.callbacks import Callback, EarlyStopping, ReduceLROnPlateau

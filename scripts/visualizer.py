@@ -1,7 +1,5 @@
 """Visualization utilities for training and evaluation outputs."""
 
-from __future__ import annotations
-
 import math
 import random
 from collections import Counter
@@ -9,7 +7,6 @@ from pathlib import Path
 
 import matplotlib
 
-# Use non-interactive backend to prevent popups
 matplotlib.use("Agg")
 
 # pylint: disable=wrong-import-position
@@ -150,7 +147,6 @@ class TrainingVisualizer:
         title_suffix : str, default=""
                 Optional suffix to add to plot titles.
         """
-        # Sanitize suffix for filename
         filename_suffix = title_suffix.replace(" ", "_").replace("(", "").replace(")", "").lower()
 
         plt.figure(figsize=(10, 6))
