@@ -353,10 +353,10 @@ pytest --cov=scripts --cov-report=html
 #### Run Specific Tests
 ```bash
 # Run single test file
-pytest tests/test_dataset.py
+pytest tests/test_data_preprocessing.py
 
 # Run single test function
-pytest tests/test_dataset.py::test_normalize
+pytest tests/test_data_preprocessing.py::test_normalize
 
 # Run tests matching pattern
 pytest -k "download" -v
@@ -419,7 +419,7 @@ pytest
 | `pytest -x` | Stop at first failure |
 | `pytest --cov=scripts` | Run with coverage |
 | `pytest --cov-report=html` | Generate HTML coverage report |
-| `pytest tests/test_dataset.py` | Run single test file |
+| `pytest tests/test_data_preprocessing.py` | Run single test file |
 | `pytest -k keyword` | Run tests matching keyword |
 | `ruff check .` | Check code style |
 | `black .` | Format code |

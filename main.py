@@ -13,7 +13,7 @@ import numpy as np
 
 from scripts.config import DATA_DIR
 from scripts.data_download import main as data_download
-from scripts.dataset import (
+from scripts.data_preprocessing import (
     ImageAugmentor,
     ImageClassificationDataLoader,
 )

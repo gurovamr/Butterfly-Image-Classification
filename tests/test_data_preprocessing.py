@@ -4,7 +4,11 @@ import numpy as np
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from scripts.dataset import DatasetSplits, ImageAugmentor, ImageClassificationDataLoader
+from scripts.data_preprocessing import (
+    DatasetSplits,
+    ImageAugmentor,
+    ImageClassificationDataLoader,
+)
 
 
 class TestListImageFilePaths:
@@ -63,8 +67,8 @@ class TestLoadImages:
             fake_img = make_image()
             path_to_label = {d / "0010001.png": 1, d / "0020002.png": 2}
             loader = ImageClassificationDataLoader(d)
-            mocker.patch("scripts.dataset.load_img", return_value=MagicMock())
-            mocker.patch("scripts.dataset.img_to_array", return_value=fake_img)
+            mocker.patch("scripts.data_preprocessing.load_img", return_value=MagicMock())
+            mocker.patch("scripts.data_preprocessing.img_to_array", return_value=fake_img)
             images, labels = loader._load_images(path_to_label)
         assert len(images) == 2
         assert labels == [1, 2]
@@ -168,8 +172,8 @@ class TestLoadImagesPipeline:
             fake_img = make_image()
             (d / "0010001.png").touch()
             loader = ImageClassificationDataLoader(d)
-            mocker.patch("scripts.dataset.load_img", return_value=MagicMock())
-            mocker.patch("scripts.dataset.img_to_array", return_value=fake_img)
+            mocker.patch("scripts.data_preprocessing.load_img", return_value=MagicMock())
+            mocker.patch("scripts.data_preprocessing.img_to_array", return_value=fake_img)
             images, labels = loader.load_images()
         assert len(images) == 1
         assert labels == [1]
