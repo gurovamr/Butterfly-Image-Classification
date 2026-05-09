@@ -30,6 +30,7 @@ cd Butterfly-Image-Classification
 python -m venv .venv
 .venv\Scripts\activate
 
+python -m pip install --upgrade pip
 pip install -e .
 butterfly-classifier
 ```
@@ -47,10 +48,23 @@ The first run automatically downloads and extracts the dataset into `data/images
 ## Installation For Development
 
 ```bash
+python -m pip install --upgrade pip
 pip install -e ".[dev,test]"
 ```
 
 This installs the project in editable mode with runtime dependencies, testing tools, and linting/formatting tools.
+
+Before running the full training pipeline, verify that TensorFlow can load in the active
+environment:
+
+```bash
+python -c "import tensorflow as tf; print(tf.__version__)"
+```
+
+If this fails on Windows with a TensorFlow DLL or native runtime error, recreate the
+environment instead of installing into an existing base Anaconda environment. Also make
+sure the Microsoft Visual C++ Redistributable is installed. The project supports Python
+3.10 through 3.13, matching the TensorFlow version used by this project.
 
 ---
 
