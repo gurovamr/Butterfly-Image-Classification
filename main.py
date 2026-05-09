@@ -7,7 +7,6 @@ import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
-# pylint: disable=wrong-import-position,wrong-import-order,ungrouped-imports
 from pathlib import Path
 
 import numpy as np
@@ -23,8 +22,6 @@ from scripts.model import ButterflyClassifier
 from scripts.train import ModelTrainer
 from scripts.visualizer import TrainingVisualizer
 
-# pylint: enable=wrong-import-position,wrong-import-order,ungrouped-imports
-
 PATH_IMAGES = "data/images"
 PATH_MODELS = "models"
 PATH_RESULTS = "results"
@@ -32,7 +29,6 @@ PATH_RESULTS = "results"
 
 def run_workflow() -> None:
     """Run the full migrated workflow from data prep to evaluation."""
-    # Setup paths
     data_download(DATA_DIR)
     images_dir = Path(PATH_IMAGES)
     model_output_dir = Path(PATH_MODELS)
@@ -40,12 +36,10 @@ def run_workflow() -> None:
     results_dir = Path(PATH_RESULTS)
     results_dir.mkdir(parents=True, exist_ok=True)
 
-    # Initialize utilities
     visualizer = TrainingVisualizer(num_classes=10, save_dir=results_dir)
     trainer = ModelTrainer()
     evaluator = ModelEvaluator(num_classes=10)
 
-    # Load and prepare data
     data_loader = ImageClassificationDataLoader(images_dir)
     original_images, original_labels = data_loader.load_images()
     print(f"There are total {len(original_images)} images in this dataset.")
@@ -63,13 +57,11 @@ def run_workflow() -> None:
         f"Max pixel value after normalization: {all_images_normalized.max()}"
     )
 
-    # Visualize data
     visualizer.plot_random_images(
         original_images, original_images, original_labels, original_labels, num_images=5
     )
     visualizer.plot_class_examples(original_images, original_labels, class_index=5, num_images=5)
 
-    # Train baseline model
     print("\n=== Training Baseline Model ===")
     baseline_classifier = ButterflyClassifier(model_type="baseline")
     baseline_history = trainer.train(
@@ -89,7 +81,6 @@ def run_workflow() -> None:
     print(f"Baseline test accuracy: {baseline_test_accuracy:.4f}")
     baseline_classifier.save(model_output_dir / "augmented_model_normal.keras")
 
-    # Train improved model
     print("\n=== Training Improved Model ===")
     improved_classifier = ButterflyClassifier(model_type="improved")
     improved_history = trainer.train(
@@ -109,7 +100,6 @@ def run_workflow() -> None:
     print(f"Improved test accuracy: {improved_test_accuracy:.4f}")
     improved_classifier.save(model_output_dir / "augmented_model_upd.keras")
 
-    # Evaluate and visualize predictions
     print("\n=== Analyzing Predictions ===")
     test_predicted_labels = evaluator.predict(improved_classifier.model, splits.test_images)
     visualizer.plot_confusion_matrix(splits.test_labels, test_predicted_labels)
@@ -121,7 +111,6 @@ def run_workflow() -> None:
     )
     visualizer.plot_class_histogram(splits.test_labels, test_predicted_labels)
 
-    # Calculate per-class accuracy
     accuracy_per_class = evaluator.calculate_class_accuracy(
         splits.test_labels, test_predicted_labels
     )
@@ -133,7 +122,6 @@ def run_workflow() -> None:
         f"{least_accurate_class} ({accuracy_per_class[least_accurate_class] * 100:.2f}%)"
     )
 
-    # Summary
     print("\n" + "=" * 60)
     print("TRAINING COMPLETE!")
     print("=" * 60)

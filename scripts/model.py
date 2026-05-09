@@ -1,7 +1,5 @@
 """CNN model architecture and persistence for butterfly classification."""
 
-from __future__ import annotations
-
 from pathlib import Path
 
 from tensorflow.keras.layers import (

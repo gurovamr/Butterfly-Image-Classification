@@ -1,7 +1,5 @@
 """Data loading, augmentation, and split utilities."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Tuple
@@ -37,9 +35,9 @@ class ImageClassificationDataLoader:
 
     def _list_image_file_paths(self) -> List[Path]:
         """Return all image file paths recursively from directory and subdirectories."""
-        image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp'}
+        image_extensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp"}
         image_files = []
-        for file_path in self.directory.rglob('*'):
+        for file_path in self.directory.rglob("*"):
             if file_path.is_file() and file_path.suffix.lower() in image_extensions:
                 image_files.append(file_path)
         return image_files
