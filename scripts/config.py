@@ -1,12 +1,35 @@
 """Configuration constants and hyperparameters for butterfly classification."""
 
+import os
+import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).parent.parent
-DATA_DIR = PROJECT_ROOT / "data"
+
+def _source_project_root() -> Path:
+    """Return the repository root when running from source."""
+    return Path(__file__).resolve().parent.parent
+
+
+def _frozen_runtime_root() -> Path:
+    """Return a stable writable directory for PyInstaller executables."""
+    app_dir_name = "Butterfly-Image-Classification"
+
+    if os.name == "nt":
+        base_dir = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local"))
+    elif sys.platform == "darwin":
+        base_dir = Path.home() / "Library" / "Application Support"
+    else:
+        base_dir = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
+
+    return base_dir / app_dir_name
+
+
+PROJECT_ROOT = _source_project_root()
+RUNTIME_ROOT = _frozen_runtime_root() if getattr(sys, "frozen", False) else PROJECT_ROOT
+DATA_DIR = RUNTIME_ROOT / "data"
 IMAGES_DIR = DATA_DIR / "images"
-MODELS_DIR = PROJECT_ROOT / "models"
-RESULTS_DIR = PROJECT_ROOT / "results"
+MODELS_DIR = RUNTIME_ROOT / "models"
+RESULTS_DIR = RUNTIME_ROOT / "results"
 
 ZENODO_URL = "https://zenodo.org/records/7559420/files/leedsbutterfly_dataset_v1.1.zip?download=1"
 

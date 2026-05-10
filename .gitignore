@@ -4,6 +4,7 @@
 venv/
 data/
 .pytest_cache/
+.butterfly-env/
 tests/__pycache__/
 scripts/__pycache__/
 models/
@@ -17,3 +18,4 @@ results/
 dist/
 build/
 *.egg-info/
+*.spec
