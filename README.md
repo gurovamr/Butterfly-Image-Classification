@@ -40,7 +40,7 @@ butterfly-classifier
 python main.py
 ```
 
-The first run automatically downloads and extracts the dataset into `data/images/`. Trained models are saved to `models/`, and result plots are saved to `results/`.
+The first run automatically downloads and extracts the dataset. When running from source, files are stored in `data/images/`, `models/`, and `results/` inside the repository. When running a packaged executable, files are stored in your user app data directory instead, for example `%LOCALAPPDATA%\Butterfly-Image-Classification\` on Windows.
 
 ---
 

@@ -9,31 +9,35 @@ os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 from pathlib import Path
 
-import numpy as np
-
-from scripts.config import DATA_DIR
+from scripts.config import DATA_DIR, IMAGES_DIR, MODELS_DIR, RESULTS_DIR
 from scripts.data_download import main as data_download
-from scripts.data_preprocessing import (
-    ImageAugmentor,
-    ImageClassificationDataLoader,
-)
-from scripts.evaluator import ModelEvaluator
-from scripts.model import ButterflyClassifier
-from scripts.train import ModelTrainer
-from scripts.visualizer import TrainingVisualizer
-
-PATH_IMAGES = "data/images"
-PATH_MODELS = "models"
-PATH_RESULTS = "results"
 
 
 def run_workflow() -> None:
     """Run the full migrated workflow from data prep to evaluation."""
+    print("Starting Butterfly Image Classification...", flush=True)
+    print(f"Data directory:    {DATA_DIR.absolute()}", flush=True)
+    print(f"Models directory:  {MODELS_DIR.absolute()}", flush=True)
+    print(f"Results directory: {RESULTS_DIR.absolute()}", flush=True)
+    print("Loading machine learning dependencies. This can take a moment...", flush=True)
+
+    import numpy as np
+
+    from scripts.data_preprocessing import (
+        ImageAugmentor,
+        ImageClassificationDataLoader,
+    )
+    from scripts.evaluator import ModelEvaluator
+    from scripts.model import ButterflyClassifier
+    from scripts.train import ModelTrainer
+    from scripts.visualizer import TrainingVisualizer
+
+    print("Checking dataset...", flush=True)
     data_download(DATA_DIR)
-    images_dir = Path(PATH_IMAGES)
-    model_output_dir = Path(PATH_MODELS)
+    images_dir = Path(IMAGES_DIR)
+    model_output_dir = Path(MODELS_DIR)
     model_output_dir.mkdir(parents=True, exist_ok=True)
-    results_dir = Path(PATH_RESULTS)
+    results_dir = Path(RESULTS_DIR)
     results_dir.mkdir(parents=True, exist_ok=True)
 
     visualizer = TrainingVisualizer(num_classes=10, save_dir=results_dir)
@@ -41,10 +45,17 @@ def run_workflow() -> None:
     evaluator = ModelEvaluator(num_classes=10)
 
     data_loader = ImageClassificationDataLoader(images_dir)
+    print("Loading images...", flush=True)
     original_images, original_labels = data_loader.load_images()
-    print(f"There are total {len(original_images)} images in this dataset.")
+    print(f"There are total {len(original_images)} images in this dataset.", flush=True)
+    if not original_images:
+        raise RuntimeError(
+            "No dataset images were found after download/extraction. "
+            f"Expected images under: {images_dir.absolute()}"
+        )
 
     augmentor = ImageAugmentor(augmentations_per_image=4)
+    print("Preparing augmented train/validation/test splits...", flush=True)
     splits = augmentor.augment_and_split(original_images, original_labels)
 
     all_images_normalized = np.concatenate(
