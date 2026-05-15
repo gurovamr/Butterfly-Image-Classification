@@ -55,7 +55,7 @@ jobs:
 
       - name: Publish test results to PR
         uses: EnricoMi/publish-unit-test-result-action@v2
-        if: "!cancelled()"
+        if: ${{ !cancelled() && github.actor != 'dependabot[bot]' }}
         with:
           files: junit/*.xml
 
