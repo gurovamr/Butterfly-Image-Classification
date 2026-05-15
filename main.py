@@ -2,128 +2,151 @@
 
 from __future__ import annotations
 
+import os
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
 from pathlib import Path
 
-from scripts.data_loader import (
-	combine_and_normalize_images,
-	create_augmented_dataset,
-	load_labeled_images_from_directory,
-	split_dataset,
-)
-from scripts.plotting import (
-	plot_class_examples,
-	plot_class_prediction_histogram,
-	plot_confusion_matrix_from_labels,
-	plot_random_images,
-	plot_random_prediction_samples,
-	plot_training_history,
-)
-from scripts.processing import (
-	build_baseline_model,
-	build_improved_model,
-	calculate_class_accuracy,
-	create_training_callbacks,
-	evaluate_model,
-	predict_class_labels,
-	save_model_artifact,
-	train_model,
-)
+from scripts.config import DATA_DIR, IMAGES_DIR, MODELS_DIR, RESULTS_DIR
+from scripts.data_download import main as data_download
 
 
 def run_workflow() -> None:
-	"""Run the full migrated workflow from data prep to evaluation."""
-	images_dir = Path("data/images")
-	model_output_dir = Path("models")
-	model_output_dir.mkdir(parents=True, exist_ok=True)
+    """Run the full migrated workflow from data prep to evaluation."""
+    print("Starting Butterfly Image Classification...", flush=True)
+    print(f"Data directory:    {DATA_DIR.absolute()}", flush=True)
+    print(f"Models directory:  {MODELS_DIR.absolute()}", flush=True)
+    print(f"Results directory: {RESULTS_DIR.absolute()}", flush=True)
+    print("Loading machine learning dependencies. This can take a moment...", flush=True)
 
-	original_images, original_labels = load_labeled_images_from_directory(images_dir)
-	print(f"There are total {len(original_images)} images in this dataset.")
+    import numpy as np
 
-	augmented_images, augmented_labels = create_augmented_dataset(
-		original_images,
-		original_labels,
-		augmentations_per_image=4,
-	)
+    from scripts.data_preprocessing import (
+        ImageAugmentor,
+        ImageClassificationDataLoader,
+    )
+    from scripts.evaluator import ModelEvaluator
+    from scripts.model import ButterflyClassifier
+    from scripts.train import ModelTrainer
+    from scripts.visualizer import TrainingVisualizer
 
-	all_images_normalized, all_labels = combine_and_normalize_images(
-		original_images,
-		original_labels,
-		augmented_images,
-		augmented_labels,
-	)
-	print(
-		"Min pixel value after normalization: "
-		f"{all_images_normalized.min()}, Max pixel value after normalization: {all_images_normalized.max()}"
-	)
+    print("Checking dataset...", flush=True)
+    data_download(DATA_DIR)
+    images_dir = Path(IMAGES_DIR)
+    model_output_dir = Path(MODELS_DIR)
+    model_output_dir.mkdir(parents=True, exist_ok=True)
+    results_dir = Path(RESULTS_DIR)
+    results_dir.mkdir(parents=True, exist_ok=True)
 
-	plot_random_images(original_images, augmented_images, original_labels, augmented_labels, num_images=5)
-	plot_class_examples(original_images, original_labels, class_index=5, num_images=5)
+    visualizer = TrainingVisualizer(num_classes=10, save_dir=results_dir)
+    trainer = ModelTrainer()
+    evaluator = ModelEvaluator(num_classes=10)
 
-	splits = split_dataset(all_images_normalized, all_labels)
-	callbacks = create_training_callbacks()
+    data_loader = ImageClassificationDataLoader(images_dir)
+    print("Loading images...", flush=True)
+    original_images, original_labels = data_loader.load_images()
+    print(f"There are total {len(original_images)} images in this dataset.", flush=True)
+    if not original_images:
+        raise RuntimeError(
+            "No dataset images were found after download/extraction. "
+            f"Expected images under: {images_dir.absolute()}"
+        )
 
-	baseline_model = build_baseline_model()
-	baseline_history = train_model(
-		baseline_model,
-		splits.train_images,
-		splits.train_labels,
-		splits.val_images,
-		splits.val_labels,
-		epochs=30,
-		callbacks=callbacks,
-	)
-	plot_training_history(baseline_history.history, title_suffix=" (Baseline)")
-	_, baseline_test_accuracy = evaluate_model(
-		baseline_model,
-		splits.test_images,
-		splits.test_labels,
-	)
-	print(f"Baseline test accuracy: {baseline_test_accuracy:.4f}")
-	save_model_artifact(baseline_model, model_output_dir / "augmented_model_normal.keras")
+    augmentor = ImageAugmentor(augmentations_per_image=4)
+    print("Preparing augmented train/validation/test splits...", flush=True)
+    splits = augmentor.augment_and_split(original_images, original_labels)
 
-	improved_model = build_improved_model()
-	improved_history = train_model(
-		improved_model,
-		splits.train_images,
-		splits.train_labels,
-		splits.val_images,
-		splits.val_labels,
-		epochs=30,
-		callbacks=callbacks,
-	)
-	plot_training_history(improved_history.history, title_suffix=" (Improved)")
-	_, improved_test_accuracy = evaluate_model(
-		improved_model,
-		splits.test_images,
-		splits.test_labels,
-	)
-	print(f"Improved test accuracy: {improved_test_accuracy:.4f}")
-	save_model_artifact(improved_model, model_output_dir / "augmented_model_upd.keras")
+    all_images_normalized = np.concatenate(
+        [splits.train_images, splits.val_images, splits.test_images],
+        axis=0,
+    )
+    print(
+        "Min pixel value after normalization: "
+        f"{all_images_normalized.min()}, "
+        f"Max pixel value after normalization: {all_images_normalized.max()}"
+    )
 
-	test_predicted_labels = predict_class_labels(improved_model, splits.test_images)
-	plot_confusion_matrix_from_labels(splits.test_labels, test_predicted_labels)
-	plot_random_prediction_samples(
-		splits.test_images,
-		splits.test_labels,
-		test_predicted_labels,
-		num_images=10,
-	)
-	plot_class_prediction_histogram(splits.test_labels, test_predicted_labels)
+    visualizer.plot_random_images(
+        original_images, original_images, original_labels, original_labels, num_images=5
+    )
+    visualizer.plot_class_examples(original_images, original_labels, class_index=5, num_images=5)
 
-	accuracy_per_class = calculate_class_accuracy(splits.test_labels, test_predicted_labels, num_classes=10)
-	for class_label, accuracy in accuracy_per_class.items():
-		print(f"Class {class_label}: {accuracy * 100:.2f}%")
-	least_accurate_class = min(accuracy_per_class, key=accuracy_per_class.get)
-	print(
-		"Class with the least accuracy: "
-		f"{least_accurate_class} ({accuracy_per_class[least_accurate_class] * 100:.2f}%)"
-	)
+    print("\n=== Training Baseline Model ===")
+    baseline_classifier = ButterflyClassifier(model_type="baseline")
+    baseline_history = trainer.train(
+        baseline_classifier.model,
+        splits.train_images,
+        splits.train_labels,
+        splits.val_images,
+        splits.val_labels,
+        epochs=30,
+    )
+    visualizer.plot_training_history(baseline_history.history, title_suffix=" (Baseline)")
+    _, baseline_test_accuracy = evaluator.evaluate(
+        baseline_classifier.model,
+        splits.test_images,
+        splits.test_labels,
+    )
+    print(f"Baseline test accuracy: {baseline_test_accuracy:.4f}")
+    baseline_classifier.save(model_output_dir / "augmented_model_normal.keras")
+
+    print("\n=== Training Improved Model ===")
+    improved_classifier = ButterflyClassifier(model_type="improved")
+    improved_history = trainer.train(
+        improved_classifier.model,
+        splits.train_images,
+        splits.train_labels,
+        splits.val_images,
+        splits.val_labels,
+        epochs=30,
+    )
+    visualizer.plot_training_history(improved_history.history, title_suffix=" (Improved)")
+    _, improved_test_accuracy = evaluator.evaluate(
+        improved_classifier.model,
+        splits.test_images,
+        splits.test_labels,
+    )
+    print(f"Improved test accuracy: {improved_test_accuracy:.4f}")
+    improved_classifier.save(model_output_dir / "augmented_model_upd.keras")
+
+    print("\n=== Analyzing Predictions ===")
+    test_predicted_labels = evaluator.predict(improved_classifier.model, splits.test_images)
+    visualizer.plot_confusion_matrix(splits.test_labels, test_predicted_labels)
+    visualizer.plot_prediction_samples(
+        splits.test_images,
+        splits.test_labels,
+        test_predicted_labels,
+        num_images=10,
+    )
+    visualizer.plot_class_histogram(splits.test_labels, test_predicted_labels)
+
+    accuracy_per_class = evaluator.calculate_class_accuracy(
+        splits.test_labels, test_predicted_labels
+    )
+    for class_label, accuracy in accuracy_per_class.items():
+        print(f"Class {class_label}: {accuracy * 100:.2f}%")
+    least_accurate_class = min(accuracy_per_class, key=accuracy_per_class.get)
+    print(
+        "Class with the least accuracy: "
+        f"{least_accurate_class} ({accuracy_per_class[least_accurate_class] * 100:.2f}%)"
+    )
+
+    print("\n" + "=" * 60)
+    print("TRAINING COMPLETE!")
+    print("=" * 60)
+    print(f"Models saved to:      {model_output_dir.absolute()}")
+    print(f"Plots saved to:       {results_dir.absolute()}")
+    print(f"Baseline accuracy:    {baseline_test_accuracy:.4f}")
+    print(f"Improved accuracy:    {improved_test_accuracy:.4f}")
+    print("=" * 60)
 
 
 def main() -> None:
-	"""Program entry point."""
-	run_workflow()
+    """Program entry point."""
+    run_workflow()
 
 
 if __name__ == "__main__":
-	main()
+    main()
