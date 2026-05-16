@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/gurovamr/Butterfly-Image-Classification/branch/main/graph/badge.svg)](https://codecov.io/gh/gurovamr/Butterfly-Image-Classification)
 [![Release](https://img.shields.io/github/v/release/gurovamr/Butterfly-Image-Classification)](https://github.com/gurovamr/Butterfly-Image-Classification/releases)
 
-A deep learning pipeline that trains CNN models to classify 10 species of butterflies from the [Leeds Butterfly Dataset](https://zenodo.org/records/7559420). The project covers the full ML workflow: data download, preprocessing, augmentation, training two model architectures, evaluation, and visualization.
+A deep learning pipeline that trains CNN models to classify 10 species of butterflies from the [Leeds Butterfly Dataset](https://zenodo.org/records/7559420). The project covers the full ML workflow: data download, preprocessing, augmentation, training two model architectures, evaluation and visualization.
 
 ---
 
@@ -52,7 +52,7 @@ python -m pip install --upgrade pip
 pip install -e ".[dev,test]"
 ```
 
-This installs the project in editable mode with runtime dependencies, testing tools, and linting/formatting tools.
+This installs the project in editable mode with runtime dependencies, testing tools and linting/formatting tools.
 
 Before running the full training pipeline, verify that TensorFlow can load in the active
 environment:
@@ -86,12 +86,12 @@ pytest --cov=scripts --cov-report=term-missing
 
 ```text
 Butterfly-Image-Classification/
-|-- main.py                         # Entry point for the full workflow
-|-- scripts/                        # Core package
+|-- main.py                         # Script for the full workflow
+|-- scripts/                        # Core scripts
 |   |-- __init__.py                 # Package marker and version
 |   |-- config.py                   # Hyperparameters and path constants
-|   |-- data_download.py            # Dataset download, extraction, and cleanup
-|   |-- data_preprocessing.py       # Image loading, augmentation, normalization, and splitting
+|   |-- data_download.py            # Dataset download, extraction and cleanup
+|   |-- data_preprocessing.py       # Image loading, augmentation, normalization and splitting
 |   |-- model.py                    # CNN model architectures
 |   |-- train.py                    # Training loop and callbacks
 |   |-- evaluator.py                # Evaluation, predictions, and per-class accuracy
@@ -103,13 +103,15 @@ Butterfly-Image-Classification/
 |   |-- test_evaluator.py
 |   |-- test_model_train.py
 |   `-- test_visualizer.py
+|-- project_documents/              # Project assignments
+|   `-- Final_Presentation.pdf      
 |-- .github/
 |   |-- workflows/
-|   |   |-- ci.yml                  # Linting, formatting, tests, coverage, and Codecov
+|   |   |-- ci.yml                  # Linting, formatting, tests, coverage and Codecov
 |   |   |-- matrix.yml              # Python version matrix and pylint
 |   |   `-- build_binaries.yml      # PyInstaller release builds
 |   `-- dependabot.yml              # Dependency update automation
-|-- pyproject.toml                  # Package metadata, dependencies, and tool config
+|-- pyproject.toml                  # Package dependencies
 |-- codecov.yml                     # Codecov status-check configuration
 `-- LICENSE
 ```
@@ -137,14 +139,14 @@ All tunable parameters live in [`scripts/config.py`](scripts/config.py):
 | Workflow | Trigger | What it does |
 |---|---|---|
 | CI | Push to `main`, every PR | Ruff, Black, tests, coverage upload |
-| Matrix | Push to `main`, every PR | Tests on Python 3.10, 3.11, and 3.12 plus pylint |
-| Build Binaries | `v*` tag push | Builds executables for Linux, Windows, and macOS |
+| Matrix | Push to `main`, every PR, manual dispatch | Tests on Python 3.10, 3.11, and 3.12 plus pylint |
+| Build Binaries | `v*` tag push, manual dispatch | Builds executables for Linux, Windows, and macOS |
 
 ---
 
 ## Requirements
 
-- Python >= 3.10
+- Python >= 3.10 and < 3.14
 - TensorFlow 2.21+
 - See [`pyproject.toml`](pyproject.toml) for the full dependency list
 
