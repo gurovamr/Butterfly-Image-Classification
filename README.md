@@ -40,6 +40,9 @@ butterfly-classifier
 ```bash
 python main.py
 ```
+
+The first run automatically downloads and extracts the dataset. When running from source, files are stored in `data/images/`, `models/`, and `results/` inside the repository. When running a packaged executable, files are stored in your user app data directory instead, for example `%LOCALAPPDATA%\Butterfly-Image-Classification\` on Windows.
+
 ### Running the Pre-built Linux Binary
 
 You can download and run the standalone Linux binary directly from your terminal:
@@ -54,9 +57,6 @@ chmod +x butterfly-classifier-linux
 # 3. Run the application
 ./butterfly-classifier-linux
 ```
-
-The first run automatically downloads and extracts the dataset. When running from source, files are stored in `data/images/`, `models/`, and `results/` inside the repository. When running a packaged executable, files are stored in your user app data directory instead, for example `%LOCALAPPDATA%\Butterfly-Image-Classification\` on Windows.
-
 ---
 
 ## Installation For Development
